@@ -31,7 +31,6 @@ test('ensure daemon wrapper spawns correctly', function(t) {
 test('ensure sproc spawns the daemon wrapper properly', function(t) {
   var sproc = require('../sproc');
   var options = {
-    keepProcessReference : true,
     script: __dirname + '/shared-daemon',
     port: 5666
   };

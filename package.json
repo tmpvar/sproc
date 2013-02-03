@@ -1,0 +1,31 @@
+{
+  "name": "sproc",
+  "version": "0.1.0",
+  "description": "shared process",
+  "main": "sproc.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap ./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tmpvar/sproc.git"
+  },
+  "keywords": [
+    "shared",
+    "process",
+    "daemon"
+  ],
+  "author": "Elijah Insua <tmpvar@gmail.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "optimist": "~0.3.5",
+    "defaults": "~1.0.0"
+  },
+  "devDependencies" : {
+    "tap": "~0.4.0"
+  }
+}

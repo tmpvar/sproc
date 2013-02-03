@@ -1,13 +1,24 @@
+if (require.main !== module) {
+  // Daemon
+  var clients = [];
+
+  module.exports = function(options, stream) {
+    stream.setMaxListeners(0);
+
+    clients.forEach(function(client) {
+      client.pipe(stream);
+      stream.pipe(client);
+    });
+
+    clients.push(stream);
+  };
+}
+
+
 var test = require('tap').test,
     net = require('net'),
     child = require('child_process'),
     path = require('path');
-
-// Daemon
-var clients = [];
-module.exports = function(stream) {
-  clients.push(stream);
-};
 
 test('ensure daemon wrapper spawns correctly', function(t) {
   var p = child.spawn('node', [
@@ -40,9 +51,36 @@ test('ensure sproc spawns the daemon wrapper properly', function(t) {
       host: 'localhost',
       port: 5666
     }, function() {
-      t.equal(clients.length, 1);
       p.kill();
       t.end();
+    });
+  });
+});
+
+
+test('ensure sproc spawns the daemon wrapper properly', function(t) {
+  var options = {
+    keepProcessReference : true,
+    script: __dirname + '/ping-pong',
+    port: 5666
+  };
+
+  sproc(options, function(err, a, p) {
+    sproc(options, function(err, b) {
+      b.on('data', function(buffer) {
+        if (buffer.toString().indexOf('pong') > -1) {
+          b.end()
+          p.kill();
+          t.end();
+        }
+      });
+      b.write('ping');
+    });
+
+    a.on('data', function(buffer) {
+      if (buffer.toString().indexOf('ping') > -1) {
+        a.write('pong');
+      }
     });
   });
 });

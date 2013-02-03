@@ -48,7 +48,7 @@ module.exports = function(options, fn) {
   options = defaults(options, {
     host: 'localhost',
     port: 4499,
-    log : console.log
+    log : function() {}
   });
 
   connect(options, fn);

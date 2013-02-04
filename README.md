@@ -1,8 +1,12 @@
 # sproc
 
-shared process
+This module is useful when you want to spawn a single daemon and be able to connect to it from other processes.
 
-Share resources that only allow a single connection (i.e. serial ports)
+workflow:
+
+* attempt to connect to daemon
+ * if connection fails, spawn daemon (return to first step)
+* upon connection, callback with a stream
 
 ## Install
 
@@ -10,24 +14,11 @@ Share resources that only allow a single connection (i.e. serial ports)
 
 ## Use
 
-```javascript
-
-// main.js
-var sproc = require('sproc');
-
-sproc({
-  script: 'daemon.js',
-  port: 4499,
-}, function(proc) {
-  proc.stream.write('hello');
-  stream.on('data', console.log); // outputs hello
-});
-
-```
+### daemon.js
 
 ```javascript
 
-// echo daemon (daemon.js)
+// echo daemon
 
 var clients = 0;
 
@@ -49,11 +40,27 @@ module.exports = function(options, stream) {
 
 ```
 
-var settings = {};
-client.on('settings', function(s) {
-  merge(settings, s);
+### main.js
+
+```javascript
+
+var sproc = require('sproc');
+
+sproc({
+  script: './daemon',
+  port: 4499,
+}, function(proc) {
+  proc.stream.write('hello');
+  stream.on('data', console.log); // outputs hello
 });
 
+```
+
+### options
+
+ * `port` - port to use for listening/connecting (default: _4499_)
+ * `keepProcessReference` - do not detatch from the daemon (default: _false_)
+ * `log` - a function (optional)
 
 ## License
 

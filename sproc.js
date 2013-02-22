@@ -22,7 +22,7 @@ var createProcess = function(options) {
 
 var timer;
 var connect = function(options, fn) {
-  var log = options.log;
+  var log = options.log || function() {};
 
   log('attempting to connect to ' + options.host + ':' + options.port);
   var client = net.createConnection(options, function() {

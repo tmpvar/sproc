@@ -2,7 +2,7 @@ var net = require('net'),
     options = JSON.parse(require('optimist').argv.options),
     handler;
 
-if (options.script ){
+if (options.script){
   handler = require(options.script);
 }
 

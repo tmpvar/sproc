@@ -5,6 +5,22 @@ var util = require('util'),
     path = require('path'),
     child = require('child_process');
 
+
+var proc;
+
+var createProcess = function(options) {
+  if (!proc) {
+    proc = child.spawn('node', [
+      path.join(__dirname, 'daemon.js'),
+      '--options', JSON.stringify(options)
+    ], {
+      stdio: !options.keepProcessReference ? 'pipe' : 'inherit',
+      detached: !options.keepProcessReference
+    });
+  }
+}
+
+var timer;
 var connect = function(options, fn) {
   var log = options.log;
 
@@ -18,21 +34,14 @@ var connect = function(options, fn) {
     log('connection error: ' + err)
     // daemon is not running
     if (err.code && err.code === 'ECONNREFUSED') {
-
-      var proc = child.spawn('node', [
-        path.join(__dirname, 'daemon.js'),
-        '--options', JSON.stringify(options)
-      ], {
-        stdio: !options.keepProcessReference ? 'pipe' : 'inherit',
-        detached: !options.keepProcessReference
-      });
+      createProcess(options);
 
       !options.keepProcessReference && proc.unref();
       client.destroy();
-
-      setTimeout(function() {
+      clearTimeout(timer);
+      timer = setTimeout(function() {
         connect(options, fn);
-      }, 100);
+      }, 500);
     } else {
       fn(err);
     }
